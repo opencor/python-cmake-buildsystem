@@ -3,9 +3,7 @@
 set(libdir ${SRC_DIR}/Lib)
 file(GLOB_RECURSE libfiles RELATIVE ${libdir} "${libdir}/*")
 
-if(UNIX)
-    set(plat_subdir "plat-linux2")
-endif()
+set(plat_subdir plat-${PY_PLATFORM})
 
 foreach(file ${libfiles})
     # Don't install files for other platforms
