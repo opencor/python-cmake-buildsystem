@@ -445,6 +445,17 @@ function(add_libpython name type install component)
         # in the original "pcbuild.sln" solution file because it was side effect
         # of having "/Zi" flag set.
         set_target_properties(${name} PROPERTIES LINK_FLAGS /OPT:NOICF)
+        # Windows debug builds expect the library to have a `_d` postfix because
+        # `PC/pyconfig.h` has:
+        #
+        #    if defined(_DEBUG)
+        #            pragma comment(lib,"python35_d.lib")
+        #    elif defined(Py_LIMITED_API)
+        #            pragma comment(lib,"python3.lib")
+        #    else
+        #            pragma comment(lib,"python35.lib")
+        #    endif /* _DEBUG */
+        set_target_properties(${name} PROPERTIES DEBUG_POSTFIX _d)
     endif()
 
     set_target_properties(${name} PROPERTIES
