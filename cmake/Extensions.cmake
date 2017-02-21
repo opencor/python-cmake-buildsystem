@@ -193,6 +193,10 @@ function(add_python_extension name)
             set_target_properties(${target_name} PROPERTIES
                 SUFFIX .pyd
             )
+            if(MSVC)
+                # Windows debug builds expect extensions to have a `_d` postfix
+                set_target_properties(${target_name} PROPERTIES DEBUG_POSTFIX _d)
+            endif()
         endif()
 
         if(APPLE)
