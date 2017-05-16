@@ -190,6 +190,9 @@ set(_download_2.7.11_md5 "6b6076ec9e93f05dd63e47eb9c15728b")
 set(_download_2.7.12_md5 "88d61f82e3616a4be952828b3694109d")
 set(_download_3.5.1_md5 "be78e48cdfc1a7ad90efff146dce6cfe")
 set(_download_3.5.2_md5 "3fe8434643a78630c61c6464fe2e7e72")
+set(_download_3.5.3_md5 "6192f0e45f02575590760e68c621a488")
+set(_download_3.6.0_md5 "3f7062ccf8be76491884d0e47ac8b251")
+set(_download_3.6.1_md5 "2d0fc9f3a5940707590e07f03ecb08b9")
 set(_extracted_dir "Python-${PY_VERSION}")
 
 if(NOT EXISTS ${SRC_DIR}/${_landmark} AND DOWNLOAD_SOURCES)
@@ -248,7 +251,7 @@ string(REGEX REPLACE "[0-9]\\.[0-9]+\\.([0-9]+)" "\\1"
 set(PY_VERSION "${PY_VERSION_MAJOR}.${PY_VERSION_MINOR}.${PY_VERSION_PATCH}")
 message(STATUS "PY_VERSION: ${PY_VERSION}")
 if(NOT DEFINED _download_${PY_VERSION}_md5)
-    message(FATAL_ERROR "error: unknown python version '${PY_VERSION}'. Valid version should match '2.7.[3-12]' or '3.5.[1-2]'")
+    message(FATAL_ERROR "error: unknown python version '${PY_VERSION}'. Valid version should match '2.7.[3-12]', '3.5.[1-3]' or '3.6.[0-1]'")
 endif()
 
 # Convenience boolean variables to easily test python version
