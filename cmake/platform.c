@@ -1,4 +1,4 @@
-// Based on code in Python's `configure` script
+// Based on code in Python's `configure` script (see conftest.c)
 
 #include <stdio.h>
 

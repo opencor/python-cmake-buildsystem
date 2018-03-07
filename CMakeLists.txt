@@ -176,8 +176,9 @@ get_filename_component(SRC_DIR "${SRC_DIR}" ABSOLUTE)
 get_filename_component(_parent_dir ${CMAKE_CURRENT_BINARY_DIR} PATH)
 string(REGEX REPLACE "rc[1-9]$" "" _py_version_patch_no_rc ${PY_VERSION_PATCH})
 set(_py_version_no_rc "${PY_VERSION_MAJOR}.${PY_VERSION_MINOR}.${_py_version_patch_no_rc}")
-set(_download_link "http://www.python.org/ftp/python/${_py_version_no_rc}/Python-${PY_VERSION}.tgz")
+set(_download_link "https://www.python.org/ftp/python/${_py_version_no_rc}/Python-${PY_VERSION}.tgz")
 # Variable below represent the set of supported python version.
+# 2.7
 set(_download_2.7.3_md5 "2cf641732ac23b18d139be077bd906cd")
 set(_download_2.7.4_md5 "592603cfaf4490a980e93ecb92bde44a")
 set(_download_2.7.5_md5 "b4f01a1d0ba0b46b05c73b2ac909b1df")
@@ -188,9 +189,19 @@ set(_download_2.7.9_md5 "5eebcaa0030dc4061156d3429657fb83")
 set(_download_2.7.10_md5 "d7547558fd673bd9d38e2108c6b42521")
 set(_download_2.7.11_md5 "6b6076ec9e93f05dd63e47eb9c15728b")
 set(_download_2.7.12_md5 "88d61f82e3616a4be952828b3694109d")
+set(_download_2.7.13_md5 "17add4bf0ad0ec2f08e0cae6d205c700")
+set(_download_2.7.14_md5 "cee2e4b33ad3750da77b2e85f2f8b724")
+# 3.5
 set(_download_3.5.1_md5 "be78e48cdfc1a7ad90efff146dce6cfe")
 set(_download_3.5.2_md5 "3fe8434643a78630c61c6464fe2e7e72")
 set(_download_3.5.3_md5 "6192f0e45f02575590760e68c621a488")
+set(_download_3.5.4_md5 "2ed4802b7a2a7e40d2e797272bf388ec")
+# 3.6
+set(_download_3.6.1_md5 "2d0fc9f3a5940707590e07f03ecb08b9")
+set(_download_3.6.2_md5 "e1a36bfffdd1d3a780b1825daf16e56c")
+set(_download_3.6.3_md5 "e9180c69ed9a878a4a8a3ab221e32fa9")
+set(_download_3.6.4_md5 "9de6494314ea199e3633211696735f65")
+
 set(_extracted_dir "Python-${PY_VERSION}")
 
 if(NOT EXISTS ${SRC_DIR}/${_landmark} AND DOWNLOAD_SOURCES)
@@ -244,12 +255,18 @@ string(REGEX REPLACE "([0-9])\\..+" "\\1"
     PY_VERSION_MAJOR ${_version})
 string(REGEX REPLACE "[0-9]\\.([0-9]+)\\..+" "\\1"
     PY_VERSION_MINOR ${_version})
-string(REGEX REPLACE "[0-9]\\.[0-9]+\\.([0-9]+)" "\\1"
+string(REGEX REPLACE "[0-9]\\.[0-9]+\\.([0-9]+)[+]?" "\\1"
     PY_VERSION_PATCH ${_version})
 set(PY_VERSION "${PY_VERSION_MAJOR}.${PY_VERSION_MINOR}.${PY_VERSION_PATCH}")
 message(STATUS "PY_VERSION: ${PY_VERSION}")
 if(NOT DEFINED _download_${PY_VERSION}_md5)
-    message(FATAL_ERROR "error: unknown python version '${PY_VERSION}'. Valid version should match '2.7.[3-12]' or '3.5.[1-3]'")
+    message(FATAL_ERROR "error: unknown python version '${PY_VERSION}'. Valid version should match '2.7.[3-14]' or '3.5.[1-4]' or  or '3.6.[1-4]'")
+endif()
+
+# Apply patches
+option(PYTHON_APPLY_PATCHES "Apply patches" ON)
+if(PYTHON_APPLY_PATCHES)
+  include(cmake/PythonApplyPatches.cmake)
 endif()
 
 # Convenience boolean variables to easily test python version
@@ -258,14 +275,6 @@ set(IS_PY2 1)
 if(PY_VERSION_MAJOR VERSION_GREATER 2)
     set(IS_PY3 1)
     set(IS_PY2 0)
-endif()
-
-# Convenience boolean variables to easily test the type of python library being build
-set(BUILD_STATIC 1)
-set(BUILD_SHARED 0)
-if(BUILD_LIBPYTHON_SHARED)
-  set(BUILD_STATIC 0)
-  set(BUILD_SHARED 1)
 endif()
 
 # Options depending of the python version
@@ -298,10 +307,6 @@ set(LIBPYTHON python${LIBPYTHON_VERSION})
 # Proceed to the configure checks
 include(cmake/ConfigureChecks.cmake)
 
-if(NOT BUILD_SHARED AND NOT BUILD_STATIC)
-    message(FATAL_ERROR "One or both of BUILD_SHARED or BUILD_STATIC must be set")
-endif()
-
 # Set PYTHONHOME
 set(LIBDIR "Lib") # See Lib/distutils/sysconfig.py - function 'get_python_lib'
 if(UNIX)
@@ -324,7 +329,12 @@ endif()
 set(LD_VERSION ${LIBPYTHON_VERSION}${ABIFLAGS})
 set(CONFIG_INSTALL_DIR share/${LIBPYTHON})
 set(EXTENSION_INSTALL_DIR ${PYTHONHOME}/lib-dynload)
-set(LIB_CONFIG_INSTALL_DIR ${PYTHONHOME}/config-${LD_VERSION})
+
+if (${LIBPYTHON_VERSION} GREATER 3.1)
+  set(LIB_CONFIG_INSTALL_DIR ${PYTHONHOME}/config-${LD_VERSION})
+else()
+  set(LIB_CONFIG_INSTALL_DIR ${PYTHONHOME}/config)
+endif()
 
 if(INSTALL_WINDOWS_TRADITIONAL)
     set(EXTENSION_INSTALL_DIR DLLs)
@@ -421,7 +431,7 @@ file(WRITE ${CONFIG_BUILD_DIR}/PythonTargets.cmake "")
 # Define python executable wrapper command to ensure
 # python executable resolves the expected python library.
 set(PYTHON_WRAPPER_COMMAND )
-if(BUILD_SHARED AND UNIX)
+if(BUILD_LIBPYTHON_SHARED AND UNIX)
     set(_envvar LD_LIBRARY_PATH)
     if(APPLE)
         set(_envvar DYLD_LIBRARY_PATH)
