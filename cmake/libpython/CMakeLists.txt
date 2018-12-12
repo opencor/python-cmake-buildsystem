@@ -532,25 +532,17 @@ if(BUILD_LIBPYTHON_SHARED)
     if(IS_PY3 AND MSVC)
         # XXX Add BuildPython3_dDef
 
-        # Generate 'python3stub.lib'
-
-        set(python3stub_def ${PROJECT_BINARY_DIR}/${LIBPYTHON_ARCHIVEDIR}/${CMAKE_CFG_INTDIR}/python3stub.def)
-        set(python3stub_lib ${PROJECT_BINARY_DIR}/${LIBPYTHON_ARCHIVEDIR}/${CMAKE_CFG_INTDIR}/python3stub.lib)
-        set(machine X86)
-        if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
-            set(machine X64)
-        endif()
-
+        # Generate 'python3stub.def'
+        set(pythonstub_def ${PROJECT_BINARY_DIR}/${LIBPYTHON_ARCHIVEDIR}/${CMAKE_CFG_INTDIR}/python3stub.def)
         add_custom_command(
-            OUTPUT ${python3stub_lib}
+            OUTPUT ${pythonstub_def}
             COMMAND ${CMAKE_COMMAND}
                 -DINPUT_DEF_FILE:PATH=${SRC_DIR}/PC/python3.def
                 -DOUTPUT_DEF_FILE:PATH=${PROJECT_BINARY_DIR}/CMakeFiles/python3stub.def
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/generate_libpythonstub_def.cmake
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 ${PROJECT_BINARY_DIR}/CMakeFiles/python3stub.def
-                ${python3stub_def}
-            COMMAND lib /nologo /def:${python3stub_def} /out:${python3stub_lib} /MACHINE:${machine}
+                ${pythonstub_def}
         )
         add_custom_target(generate_libpython3stub_def DEPENDS ${pythonstub_def})
 
