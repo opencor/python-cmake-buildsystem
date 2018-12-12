@@ -552,6 +552,21 @@ if(BUILD_LIBPYTHON_SHARED)
                 ${python3stub_def}
             COMMAND lib /nologo /def:${python3stub_def} /out:${python3stub_lib} /MACHINE:${machine}
         )
+        add_custom_target(generate_libpython3stub_def DEPENDS ${pythonstub_def})
+
+        # Build 'python3stub.lib' before linking 'python3.dll'
+        set(python3stub_lib ${PROJECT_BINARY_DIR}/${LIBPYTHON_ARCHIVEDIR}/${CMAKE_CFG_INTDIR}/python3stub.lib)
+        set(machine X86)
+        if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
+            set(machine X64)
+        endif()
+        add_custom_command(
+            OUTPUT ${python3stub_lib}
+            COMMAND lib /nologo /def:${pythonstub_def} /out:${python3stub_lib} /MACHINE:${machine}
+            COMMENT "Rebuilding python3stub.lib"
+            DEPENDS generate_libpython3stub_def
+            VERBATIM
+        )
         add_custom_target(generate_libpython3stub_lib DEPENDS ${python3stub_lib})
 
         # Build 'python3.dll'
