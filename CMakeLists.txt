@@ -328,7 +328,7 @@ endif()
 # This is the major version number of Python
 if(WIN32)
     set(LIBPYTHON_VERSION ${PY_VERSION_MAJOR}${PY_VERSION_MINOR})
-    if("CMAKE_BUILD_TYPE" == "Debug")
+    if("CMAKE_BUILD_TYPE" STREQUAL "Debug")
         set(LIBPYTHON python${LIBPYTHON_VERSION}_d)
     else()
         set(LIBPYTHON python${LIBPYTHON_VERSION})
