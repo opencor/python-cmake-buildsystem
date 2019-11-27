@@ -47,6 +47,10 @@ if(USE_SYSTEM_EXPAT)
     find_package(EXPAT)
 endif()
 
+if(USE_SYSTEM_LZMA)
+    find_package(LibLZMA)
+endif()
+
 if(IS_PY3 AND USE_SYSTEM_LIBMPDEC)
     find_library(LIBMPDEC_LIBRARY NAMES libmpdec)
     set(LIBMPDEC_LIBRARIES ${LIBMPDEC_LIBRARY})

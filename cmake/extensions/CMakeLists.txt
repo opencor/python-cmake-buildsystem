@@ -685,6 +685,12 @@ add_python_extension(_hashlib
 if(ENABLE_HASHLIB AND CMAKE_C_COMPILER_ID MATCHES GNU)
     set_property(SOURCE ${SRC_DIR}/Modules/_hashopenssl.c PROPERTY COMPILE_FLAGS -Wno-deprecated-declarations)
 endif()
+add_python_extension(_lzma
+    REQUIRES LIBLZMA_LIBRARIES LIBLZMA_INCLUDE_DIRS
+    SOURCES _lzmamodule.c
+    LIBRARIES ${LIBLZMA_LIBRARIES}
+    INCLUDEDIRS ${LIBLZMA_INCLUDE_DIRS}
+)
 add_python_extension(readline
     REQUIRES READLINE_INCLUDE_PATH READLINE_LIBRARY CURSES_LIBRARIES HAVE_READLINE_READLINE_H
     SOURCES readline.c
